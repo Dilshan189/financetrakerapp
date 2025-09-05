@@ -18,7 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen>
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
-  bool _agreeToTerms = false;
+
 
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -125,29 +125,11 @@ class _RegisterScreenState extends State<RegisterScreen>
       return;
     }
 
-    if (!_agreeToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please agree to the terms and conditions'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
-
     if (mounted) {
       setState(() {
         _isLoading = false;
       });
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Registration successful! Please verify your email.'),
