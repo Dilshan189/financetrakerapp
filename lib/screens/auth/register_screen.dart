@@ -17,6 +17,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
+
+  /// register method
   Future<void> _register() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (!(_formKey.currentState?.validate() ?? false)) return;
@@ -30,7 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       if (mounted) {
-        //Show success snackbar
+        ///Show success snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Register Successful!"),
@@ -89,6 +91,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+
+
                       /// Logo
                       Hero(
                         tag: "app-logo",
@@ -98,6 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           color: theme.primaryColor,
                         ),
                       ),
+
                       const SizedBox(height: 16),
 
                       Text(
@@ -108,6 +113,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
+
 
                       /// Email
                       TextFormField(
@@ -130,7 +136,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           return null;
                         },
                       ),
+
                       const SizedBox(height: 16),
+
 
                       /// Password
                       TextFormField(

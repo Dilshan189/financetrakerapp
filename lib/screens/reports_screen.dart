@@ -10,13 +10,13 @@ class ReportsScreen extends StatelessWidget {
     final transactions = context.watch<TransactionProvider>().items;
     final theme = Theme.of(context);
 
-    // Current month filter
+    /// Current month filter
     final now = DateTime.now();
     final currentMonthTx = transactions
         .where((t) => t.date.year == now.year && t.date.month == now.month)
         .toList();
 
-    // Spending by category (expenses only)
+    /// Spending by category (expenses only)
     final Map<String, double> categoryTotals = {};
     for (final t in currentMonthTx.where((t) => !t.isIncome)) {
       categoryTotals.update(
@@ -30,7 +30,7 @@ class ReportsScreen extends StatelessWidget {
       (s, v) => s + v,
     );
 
-    // Monthly income vs expenses for last 6 months (including current)
+    /// Monthly income vs expenses for last 6 months (including current)
     final List<_MonthPoint> months = [];
     for (int i = 5; i >= 0; i--) {
       final date = DateTime(now.year, now.month - i, 1);

@@ -100,6 +100,11 @@ class TransactionProvider extends ChangeNotifier {
     _sub = null;
   }
 
+  Future<void> refresh() async {
+    // Re-attach listener to force pull fresh data
+    await startListening();
+  }
+
   Future<void> addToCloud(TransactionItem item) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;

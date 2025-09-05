@@ -44,6 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         ),
       ),
+
+
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -68,6 +70,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+
+
                       /// Logo
                       Hero(
                         tag: "app-logo",
@@ -86,7 +90,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: theme.colorScheme.primary,
                         ),
                       ),
+
                       const SizedBox(height: 4),
+
+
                       Text(
                         "Sign in to continue managing your finances",
                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -94,7 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
+
                       const SizedBox(height: 24),
+
 
                       /// Email
                       TextFormField(
@@ -119,6 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
+
 
                       /// Password
                       TextFormField(
@@ -145,6 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? 'Min 6 characters'
                             : null,
                       ),
+
                       const SizedBox(height: 20),
 
                       /// Login Button
@@ -165,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
 
                               if (mounted) {
-                                // Show success snackbar
+                                /// Show success snackbar
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(
                                   const SnackBar(
@@ -219,7 +230,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               : const Text("Login"),
                         ),
                       ),
+
                       const SizedBox(height: 16),
+
 
                       /// Register Link
                       TextButton(

@@ -49,6 +49,8 @@ class _AuthLanding extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+
+
                   /// Logo with animation
                   Hero(
                     tag: "app-logo",
@@ -63,6 +65,8 @@ class _AuthLanding extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
+
+
 
                   /// App Title
                   Text(
@@ -81,6 +85,8 @@ class _AuthLanding extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
+
+
                   /// Description
                   Text(
                     "Smart budgeting, easy tracking, and better money management – all in one app.",
@@ -91,6 +97,8 @@ class _AuthLanding extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
+
+
 
                   /// Buttons Section
                   Column(
@@ -142,6 +150,8 @@ class _AuthLanding extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 30),
+
+
 
                   /// Footer Text
                   Text(

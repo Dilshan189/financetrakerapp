@@ -112,7 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-
 class _DashboardWelcome extends StatelessWidget {
   final String userEmail;
   const _DashboardWelcome({required this.userEmail});
@@ -122,8 +121,6 @@ class _DashboardWelcome extends StatelessWidget {
     return _HomeDashboard(userEmail: userEmail);
   }
 }
-
-
 
 class _HomeDashboard extends StatelessWidget {
   final String userEmail;
@@ -159,9 +156,14 @@ class _HomeDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Welcome${userEmail.isNotEmpty ? ', ' : ''}$userEmail',
-            style: Theme.of(context).textTheme.titleLarge,
+          _HeaderCard(
+            userEmail: userEmail,
+            totalBalance: (totalIncome - totalExpenses).clamp(
+              0,
+              double.infinity,
+            ),
+            income: totalIncome,
+            expenses: totalExpenses,
           ),
           const SizedBox(height: 12),
           LayoutBuilder(
@@ -257,16 +259,152 @@ class _HomeDashboard extends StatelessWidget {
               ),
             ),
           ),
-
         ],
       ),
     );
   }
 }
 
+class _HeaderCard extends StatelessWidget {
+  final String userEmail;
+  final double totalBalance;
+  final double income;
+  final double expenses;
+  const _HeaderCard({
+    required this.userEmail,
+    required this.totalBalance,
+    required this.income,
+    required this.expenses,
+  });
 
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            theme.colorScheme.primary,
+            theme.colorScheme.primaryContainer,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Good afternoon,',
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.onPrimary.withOpacity(0.9),
+            ),
+          ),
+          Text(
+            userEmail.isEmpty ? 'User' : userEmail,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: theme.colorScheme.onPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Total Balance',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onPrimary.withOpacity(0.9),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            totalBalance.toStringAsFixed(2),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: theme.colorScheme.onPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _HeaderStat(
+                  label: 'Income',
+                  value: income,
+                  icon: Icons.call_received,
+                  color: Colors.greenAccent.shade100,
+                  textColor: Colors.green.shade900,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _HeaderStat(
+                  label: 'Expenses',
+                  value: expenses,
+                  icon: Icons.call_made,
+                  color: Colors.pinkAccent.shade100,
+                  textColor: Colors.red.shade900,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
 
+class _HeaderStat extends StatelessWidget {
+  final String label;
+  final double value;
+  final IconData icon;
+  final Color color;
+  final Color textColor;
+  const _HeaderStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+    required this.textColor,
+  });
 
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.25),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: textColor, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelSmall?.copyWith(color: textColor),
+                ),
+                Text(
+                  value.toStringAsFixed(2),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _SummaryCard extends StatelessWidget {
   final String label;
@@ -307,10 +445,6 @@ class _SummaryCard extends StatelessWidget {
     );
   }
 }
-
-
-
-
 
 class _CategoryChip extends StatelessWidget {
   final String label;
