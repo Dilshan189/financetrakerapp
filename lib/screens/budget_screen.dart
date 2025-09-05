@@ -364,7 +364,6 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
                         decimal: true,
                       ),
                       style: theme.textTheme.headlineMedium?.copyWith(
-                        color: Colors.white,
                         fontWeight: FontWeight.w700,
                       ),
                       decoration: InputDecoration(
