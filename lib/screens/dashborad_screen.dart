@@ -5,6 +5,7 @@ import 'package:financetrakerapp/screens/reports_screen.dart';
 import 'package:financetrakerapp/screens/add_transaction_screen.dart';
 import 'package:financetrakerapp/providers/transaction_provider.dart';
 import 'package:financetrakerapp/providers/budget_provider.dart';
+import 'package:financetrakerapp/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,40 +44,80 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        title: Text(_titleForIndex(_currentIndex)),
+        title: Text(
+          _titleForIndex(_currentIndex),
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => authProvider.logout(),
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: const Icon(Icons.logout_rounded),
+              onPressed: () => _showLogoutDialog(context, authProvider),
+              style: IconButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                padding: const EdgeInsets.all(12),
+              ),
+            ),
           ),
         ],
       ),
 
-      body: pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.black,
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'Transactions',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            label: 'Budget',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.insights_outlined),
-            label: 'Reports',
-          ),
-        ],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: pages[_currentIndex],
+      ),
+
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+          selectedLabelStyle: Theme.of(
+            context,
+          ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
+          unselectedLabelStyle: Theme.of(context).textTheme.labelMedium,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home_rounded),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long_outlined),
+              activeIcon: Icon(Icons.receipt_long_rounded),
+              label: 'Transactions',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_balance_wallet_outlined),
+              activeIcon: Icon(Icons.account_balance_wallet_rounded),
+              label: 'Budget',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.analytics_outlined),
+              activeIcon: Icon(Icons.analytics_rounded),
+              label: 'Reports',
+            ),
+          ],
+        ),
       ),
 
       floatingActionButton: _currentIndex == 1
@@ -89,10 +130,41 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
                 setState(() {});
               },
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add_rounded),
               label: const Text('Add Transaction'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
             )
           : null,
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, AuthProvider authProvider) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                authProvider.logout();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+                foregroundColor: Theme.of(context).colorScheme.onError,
+              ),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -137,6 +209,7 @@ class _HomeDashboard extends StatelessWidget {
     final totalExpenses = transactions
         .where((t) => !t.isIncome)
         .fold<double>(0, (sum, t) => sum + t.amount);
+    final balance = totalIncome - totalExpenses;
     final remaining = (budget.monthlyBudget - totalExpenses).clamp(
       0.0,
       double.infinity,
@@ -151,112 +224,295 @@ class _HomeDashboard extends StatelessWidget {
       );
     }
 
+    // Recent transactions (last 5)
+    final recentTransactions = [...transactions]
+      ..sort((a, b) => b.date.compareTo(a.date))
+      ..take(5);
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _HeaderCard(
-            userEmail: userEmail,
-            totalBalance: (totalIncome - totalExpenses).clamp(
-              0,
-              double.infinity,
-            ),
-            income: totalIncome,
-            expenses: totalExpenses,
-          ),
-          const SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const double spacing = 12;
-              final int columns = constraints.maxWidth >= 900
-                  ? 3
-                  : (constraints.maxWidth >= 600 ? 2 : 1);
-              final double cardWidth =
-                  (constraints.maxWidth - spacing * (columns - 1)) / columns;
+          // Welcome Header
+          _WelcomeHeader(userEmail: userEmail, balance: balance),
 
-              return Wrap(
-                spacing: spacing,
-                runSpacing: spacing,
-                children: [
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SummaryCard(
-                      label: 'Total Income',
-                      value: totalIncome,
-                      color: Colors.green,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SummaryCard(
-                      label: 'Total Expenses',
-                      value: totalExpenses,
-                      color: Colors.red,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SummaryCard(
-                      label: 'Remaining Budget',
-                      value: remaining,
-                      color: Colors.indigo,
-                    ),
-                  ),
-                ],
-              );
-            },
+          const SizedBox(height: 24),
+
+          // Quick Stats Cards
+          _QuickStatsSection(
+            totalIncome: totalIncome,
+            totalExpenses: totalExpenses,
+            remaining: remaining,
           ),
-          const SizedBox(height: 20),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: const [
-                      Icon(Icons.pie_chart_outline),
-                      SizedBox(width: 8),
-                      Text('Monthly spending by category'),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  if (categoryTotals.isEmpty)
+
+          const SizedBox(height: 24),
+
+          // Recent Transactions
+          _RecentTransactionsSection(transactions: recentTransactions),
+
+          const SizedBox(height: 24),
+
+          // Category Spending Overview
+          _CategorySpendingSection(
+            categoryTotals: categoryTotals,
+            totalExpenses: totalExpenses,
+          ),
+
+          const SizedBox(height: 100), // Space for FAB
+        ],
+      ),
+    );
+  }
+}
+
+class _WelcomeHeader extends StatelessWidget {
+  final String userEmail;
+  final double balance;
+
+  const _WelcomeHeader({required this.userEmail, required this.balance});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final timeOfDay = _getTimeOfDay();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            theme.colorScheme.primary,
+            theme.colorScheme.primary.withOpacity(0.8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.primary.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      'No expenses yet',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    )
-                  else
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final double maxChipWidth = constraints.maxWidth;
-                        return Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: categoryTotals.entries.map((e) {
-                            final percent = totalExpenses == 0
-                                ? 0.0
-                                : (e.value / totalExpenses);
-                            return ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: maxChipWidth,
-                              ),
-                              child: _CategoryChip(
-                                label: e.key,
-                                amount: e.value,
-                                percent: percent,
-                              ),
-                            );
-                          }).toList(),
-                        );
-                      },
+                      '$timeOfDay 👋',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onPrimary.withOpacity(0.9),
+                      ),
                     ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      userEmail.isEmpty
+                          ? 'Welcome!'
+                          : _getDisplayName(userEmail),
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: theme.colorScheme.onPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onPrimary.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: theme.colorScheme.onPrimary,
+                  size: 32,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Total Balance',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onPrimary.withOpacity(0.8),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '\$${balance.toStringAsFixed(2)}',
+            style: theme.textTheme.displaySmall?.copyWith(
+              color: theme.colorScheme.onPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getTimeOfDay() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  }
+
+  String _getDisplayName(String email) {
+    final parts = email.split('@');
+    if (parts.isNotEmpty) {
+      return parts[0]
+          .replaceAll('.', ' ')
+          .split(' ')
+          .map(
+            (word) => word.isEmpty
+                ? ''
+                : word[0].toUpperCase() + word.substring(1).toLowerCase(),
+          )
+          .join(' ');
+    }
+    return email;
+  }
+}
+
+class _QuickStatsSection extends StatelessWidget {
+  final double totalIncome;
+  final double totalExpenses;
+  final double remaining;
+
+  const _QuickStatsSection({
+    required this.totalIncome,
+    required this.totalExpenses,
+    required this.remaining,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Quick Overview',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _ModernStatCard(
+                title: 'Income',
+                value: totalIncome,
+                icon: Icons.trending_up_rounded,
+                color: AppTheme.incomeColor,
+                backgroundColor: AppTheme.incomeBackgroundColor,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _ModernStatCard(
+                title: 'Expenses',
+                value: totalExpenses,
+                icon: Icons.trending_down_rounded,
+                color: AppTheme.expenseColor,
+                backgroundColor: AppTheme.expenseBackgroundColor,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _ModernStatCard(
+          title: 'Budget Remaining',
+          value: remaining,
+          icon: Icons.savings_rounded,
+          color: Theme.of(context).colorScheme.tertiary,
+          backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+          isFullWidth: true,
+        ),
+      ],
+    );
+  }
+}
+
+class _ModernStatCard extends StatelessWidget {
+  final String title;
+  final double value;
+  final IconData icon;
+  final Color color;
+  final Color backgroundColor;
+  final bool isFullWidth;
+
+  const _ModernStatCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.color,
+    required this.backgroundColor,
+    this.isFullWidth = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: isFullWidth ? double.infinity : null,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const Spacer(),
+              if (!isFullWidth)
+                Icon(
+                  Icons.more_horiz_rounded,
+                  color: theme.colorScheme.onSurfaceVariant,
+                  size: 20,
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '\$${value.toStringAsFixed(2)}',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ],
@@ -265,85 +521,151 @@ class _HomeDashboard extends StatelessWidget {
   }
 }
 
-class _HeaderCard extends StatelessWidget {
-  final String userEmail;
-  final double totalBalance;
-  final double income;
-  final double expenses;
-  const _HeaderCard({
-    required this.userEmail,
-    required this.totalBalance,
-    required this.income,
-    required this.expenses,
-  });
+class _RecentTransactionsSection extends StatelessWidget {
+  final Iterable<TransactionItem> transactions;
+
+  const _RecentTransactionsSection({required this.transactions});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            theme.colorScheme.primary,
-            theme.colorScheme.primaryContainer,
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('Recent Transactions', style: theme.textTheme.headlineSmall),
+            const Spacer(),
+            TextButton(
+              onPressed: () {
+                // Navigate to transactions tab
+                // This would require a callback to the parent widget
+              },
+              child: const Text('See All'),
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+        const SizedBox(height: 16),
+        Container(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: theme.colorScheme.outline.withOpacity(0.2),
+            ),
+          ),
+          child: transactions.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(40),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.receipt_long_rounded,
+                        size: 48,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No transactions yet',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Start tracking your finances',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  children: transactions.take(5).map((transaction) {
+                    return _TransactionListTile(transaction: transaction);
+                  }).toList(),
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TransactionListTile extends StatelessWidget {
+  final TransactionItem transaction;
+
+  const _TransactionListTile({required this.transaction});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isIncome = transaction.isIncome;
+
+    return Container(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: theme.colorScheme.outline.withOpacity(0.1)),
+        ),
+      ),
+      child: Row(
         children: [
-          Text(
-            'Good afternoon,',
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: theme.colorScheme.onPrimary.withOpacity(0.9),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isIncome
+                  ? AppTheme.incomeBackgroundColor
+                  : AppTheme.expenseBackgroundColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              isIncome ? Icons.add_rounded : Icons.remove_rounded,
+              color: isIncome ? AppTheme.incomeColor : AppTheme.expenseColor,
+              size: 20,
             ),
           ),
-          Text(
-            userEmail.isEmpty ? 'User' : userEmail,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: theme.colorScheme.onPrimary,
-              fontWeight: FontWeight.w700,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction.title.isEmpty
+                      ? transaction.category
+                      : transaction.title,
+                  style: theme.textTheme.titleMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  transaction.category,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            'Total Balance',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onPrimary.withOpacity(0.9),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            totalBalance.toStringAsFixed(2),
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.onPrimary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Expanded(
-                child: _HeaderStat(
-                  label: 'Income',
-                  value: income,
-                  icon: Icons.call_received,
-                  color: Colors.greenAccent.shade100,
-                  textColor: Colors.green.shade900,
+              Text(
+                '${isIncome ? '+' : '-'}\$${transaction.amount.toStringAsFixed(2)}',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: isIncome
+                      ? AppTheme.incomeColor
+                      : AppTheme.expenseColor,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _HeaderStat(
-                  label: 'Expenses',
-                  value: expenses,
-                  icon: Icons.call_made,
-                  color: Colors.pinkAccent.shade100,
-                  textColor: Colors.red.shade900,
+              const SizedBox(height: 2),
+              Text(
+                _formatDate(transaction.date),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -352,132 +674,164 @@ class _HeaderCard extends StatelessWidget {
       ),
     );
   }
-}
 
-class _HeaderStat extends StatelessWidget {
-  final String label;
-  final double value;
-  final IconData icon;
-  final Color color;
-  final Color textColor;
-  const _HeaderStat({
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.color,
-    required this.textColor,
-  });
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date).inDays;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.25),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      child: Row(
-        children: [
-          Icon(icon, color: textColor, size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelSmall?.copyWith(color: textColor),
-                ),
-                Text(
-                  value.toStringAsFixed(2),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: textColor,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+    if (difference == 0) return 'Today';
+    if (difference == 1) return 'Yesterday';
+    if (difference < 7) return '${difference}d ago';
+
+    return '${date.day}/${date.month}/${date.year}';
   }
 }
 
-class _SummaryCard extends StatelessWidget {
-  final String label;
-  final double value;
-  final Color color;
-  const _SummaryCard({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+class _CategorySpendingSection extends StatelessWidget {
+  final Map<String, double> categoryTotals;
+  final double totalExpenses;
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: Theme.of(context).textTheme.bodyMedium),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.circle, color: color, size: 12),
-                const SizedBox(width: 8),
-                Text(
-                  value.toStringAsFixed(2),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  final String label;
-  final double amount;
-  final double percent;
-  const _CategoryChip({
-    required this.label,
-    required this.amount,
-    required this.percent,
+  const _CategorySpendingSection({
+    required this.categoryTotals,
+    required this.totalExpenses,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final percentText = (percent * 100).toStringAsFixed(0) + '%';
-    return Chip(
-      label: Row(
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.pie_chart_rounded, color: theme.colorScheme.primary),
+            const SizedBox(width: 8),
+            Text('Category Spending', style: theme.textTheme.headlineSmall),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: theme.colorScheme.outline.withOpacity(0.2),
+            ),
+          ),
+          child: categoryTotals.isEmpty
+              ? Column(
+                  children: [
+                    Icon(
+                      Icons.category_rounded,
+                      size: 48,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No expenses yet',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Your spending breakdown will appear here',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                )
+              : Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: categoryTotals.entries.map((entry) {
+                    final percent = totalExpenses == 0
+                        ? 0.0
+                        : (entry.value / totalExpenses);
+                    final colorIndex = categoryTotals.keys.toList().indexOf(
+                      entry.key,
+                    );
+                    final color =
+                        AppTheme.categoryColors[colorIndex %
+                            AppTheme.categoryColors.length];
+
+                    return _ModernCategoryChip(
+                      label: entry.key,
+                      amount: entry.value,
+                      percent: percent,
+                      color: color,
+                    );
+                  }).toList(),
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ModernCategoryChip extends StatelessWidget {
+  final String label;
+  final double amount;
+  final double percent;
+  final Color color;
+
+  const _ModernCategoryChip({
+    required this.label,
+    required this.amount,
+    required this.percent,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label),
-          const SizedBox(width: 6),
-          Text(amount.toStringAsFixed(0), style: theme.textTheme.bodySmall),
-          const SizedBox(width: 6),
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '\$${amount.toStringAsFixed(0)}',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(width: 4),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
-              percentText,
+              '${(percent * 100).toStringAsFixed(0)}%',
               style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.primary,
+                color: color,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
