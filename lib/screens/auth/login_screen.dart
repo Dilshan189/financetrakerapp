@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'LOG IN',
+          'LOGIN',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 25,

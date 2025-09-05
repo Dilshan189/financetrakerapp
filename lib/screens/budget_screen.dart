@@ -140,9 +140,26 @@ class _BudgetOverviewCard extends StatefulWidget {
   State<_BudgetOverviewCard> createState() => _BudgetOverviewCardState();
 }
 
-class _BudgetOverviewCardState extends State<_BudgetOverviewCard> {
+class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
+    with SingleTickerProviderStateMixin {
   late TextEditingController _controller;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
   bool _isEditing = false;
+  String? _errorMessage;
+  final _formKey = GlobalKey<FormState>();
+
+  // Quick preset amounts for easy selection
+  final List<double> _presetAmounts = [
+    500,
+    1000,
+    1500,
+    2000,
+    2500,
+    3000,
+    4000,
+    5000,
+  ];
 
   @override
   void initState() {
@@ -150,12 +167,99 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard> {
     _controller = TextEditingController(
       text: widget.monthlyBudget.toStringAsFixed(0),
     );
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _animationController.dispose();
     super.dispose();
+  }
+
+  void _toggleEditing() {
+    setState(() {
+      _isEditing = !_isEditing;
+      _errorMessage = null;
+    });
+
+    if (_isEditing) {
+      _animationController.forward();
+      // Auto-focus and select all text for quick editing
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _controller.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _controller.text.length,
+        );
+      });
+    } else {
+      _animationController.reverse();
+      _validateAndSave();
+    }
+  }
+
+  void _validateAndSave() {
+    if (!_isEditing) return;
+
+    final text = _controller.text.trim();
+    if (text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Budget amount is required';
+      });
+      return;
+    }
+
+    final parsed = double.tryParse(text);
+    if (parsed == null) {
+      setState(() {
+        _errorMessage = 'Please enter a valid number';
+      });
+      return;
+    }
+
+    if (parsed <= 0) {
+      setState(() {
+        _errorMessage = 'Budget must be greater than \$0';
+      });
+      return;
+    }
+
+    if (parsed > 100000) {
+      setState(() {
+        _errorMessage = 'Budget cannot exceed \$100,000';
+      });
+      return;
+    }
+
+    // Success - save the budget
+    widget.onBudgetUpdate(parsed);
+    setState(() {
+      _isEditing = false;
+      _errorMessage = null;
+    });
+
+    _animationController.reverse();
+
+    // Show success feedback
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Budget updated to \$${parsed.toStringAsFixed(2)}'),
+        backgroundColor: AppTheme.successColor,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _selectPreset(double amount) {
+    _controller.text = amount.toStringAsFixed(0);
+    _validateAndSave();
   }
 
   @override
@@ -171,178 +275,272 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard> {
       progressColor = AppTheme.warningColor;
     }
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [progressColor, progressColor.withOpacity(0.8)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: progressColor.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.account_balance_wallet_rounded,
-                color: Colors.white,
-                size: 32,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Monthly Budget',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _isEditing = !_isEditing;
-                  });
-                },
-                icon: Icon(
-                  _isEditing ? Icons.check_rounded : Icons.edit_rounded,
-                  color: Colors.white,
-                ),
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) => Transform.scale(
+        scale: _scaleAnimation.value,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [progressColor, progressColor.withOpacity(0.8)],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: progressColor.withOpacity(0.3),
+                blurRadius: _isEditing ? 25 : 20,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-
-          const SizedBox(height: 20),
-
-          if (_isEditing) ...[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: TextField(
-                controller: _controller,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
-                decoration: InputDecoration(
-                  prefixText: '\$ ',
-                  prefixStyle: theme.textTheme.headlineMedium?.copyWith(
-                    color: Colors.white.withOpacity(0.8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.account_balance_wallet_rounded,
+                    color: Colors.white,
+                    size: 32,
                   ),
-                  border: InputBorder.none,
-                  hintText: '0.00',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _isEditing ? 'Edit Monthly Budget' : 'Monthly Budget',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(_isEditing ? 0.2 : 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: IconButton(
+                      onPressed: _toggleEditing,
+                      icon: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          _isEditing ? Icons.check_rounded : Icons.edit_rounded,
+                          key: ValueKey(_isEditing),
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              if (_isEditing) ...[
+                Form(
+                  key: _formKey,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: _errorMessage != null
+                            ? Colors.red.shade300
+                            : Colors.white.withOpacity(0.3),
+                        width: 2,
+                      ),
+                    ),
+                    child: TextField(
+                      controller: _controller,
+                      autofocus: true,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      decoration: InputDecoration(
+                        prefixText: '\$ ',
+                        prefixStyle: theme.textTheme.headlineMedium?.copyWith(
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                        border: InputBorder.none,
+                        hintText: 'Enter amount...',
+                        hintStyle: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                        ),
+                        suffixIcon: _controller.text.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.clear_rounded,
+                                  color: Colors.white.withOpacity(0.8),
+                                ),
+                                onPressed: () {
+                                  _controller.clear();
+                                  setState(() {
+                                    _errorMessage = null;
+                                  });
+                                },
+                              )
+                            : null,
+                      ),
+                      onSubmitted: (_) => _validateAndSave(),
+                      onChanged: (value) {
+                        if (_errorMessage != null) {
+                          setState(() {
+                            _errorMessage = null;
+                          });
+                        }
+                      },
+                    ),
+                  ),
                 ),
-                onSubmitted: (value) {
-                  final parsed = double.tryParse(value);
-                  if (parsed != null && parsed > 0) {
-                    widget.onBudgetUpdate(parsed);
-                    setState(() {
-                      _isEditing = false;
-                    });
-                  }
-                },
-              ),
-            ),
-          ] else ...[
-            Text(
-              '\$${widget.monthlyBudget.toStringAsFixed(2)}',
-              style: theme.textTheme.displaySmall?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
 
-          const SizedBox(height: 20),
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.error_outline_rounded,
+                          color: Colors.red.shade700,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.red.shade700,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
 
-          // Progress Bar
-          Container(
-            height: 8,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: widget.progress.clamp(0.0, 1.0),
-              child: Container(
+                const SizedBox(height: 16),
+
+                // Quick preset buttons
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _presetAmounts.map((amount) {
+                    return _PresetButton(
+                      amount: amount,
+                      onTap: () => _selectPreset(amount),
+                    );
+                  }).toList(),
+                ),
+              ] else ...[
+                GestureDetector(
+                  onTap: _toggleEditing,
+                  child: Text(
+                    '\$${widget.monthlyBudget.toStringAsFixed(2)}',
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Tap to edit',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withOpacity(0.7),
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 20),
+
+              // Progress Bar
+              Container(
+                height: 8,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.white.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(4),
                 ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Spent',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
-                      ),
+                child: FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: widget.progress.clamp(0.0, 1.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '\$${widget.monthSpent.toStringAsFixed(2)}',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      isOverBudget ? 'Over Budget' : 'Remaining',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
-                      ),
+
+              const SizedBox(height: 16),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Spent',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '\$${widget.monthSpent.toStringAsFixed(2)}',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      isOverBudget
-                          ? '\$${(widget.monthSpent - widget.monthlyBudget).toStringAsFixed(2)}'
-                          : '\$${widget.remaining.toStringAsFixed(2)}',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          isOverBudget ? 'Over Budget' : 'Remaining',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          isOverBudget
+                              ? '\$${(widget.monthSpent - widget.monthlyBudget).toStringAsFixed(2)}'
+                              : '\$${widget.remaining.toStringAsFixed(2)}',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -752,6 +950,37 @@ class _BudgetTipsSection extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PresetButton extends StatelessWidget {
+  final double amount;
+  final VoidCallback onTap;
+
+  const _PresetButton({required this.amount, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+        ),
+        child: Text(
+          '\$${amount.toStringAsFixed(0)}',
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
