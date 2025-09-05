@@ -54,6 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
+
+          if(_currentIndex == 0)
           Container(
             margin: const EdgeInsets.only(right: 8),
             child: IconButton(
