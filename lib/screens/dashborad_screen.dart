@@ -112,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+
 class _DashboardWelcome extends StatelessWidget {
   final String userEmail;
   const _DashboardWelcome({required this.userEmail});
@@ -121,6 +122,8 @@ class _DashboardWelcome extends StatelessWidget {
     return _HomeDashboard(userEmail: userEmail);
   }
 }
+
+
 
 class _HomeDashboard extends StatelessWidget {
   final String userEmail;
@@ -254,72 +257,16 @@ class _HomeDashboard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const AddTransactionScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Transaction'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    final controller = TextEditingController(
-                      text: budget.monthlyBudget.toStringAsFixed(0),
-                    );
-                    final value = await showDialog<double>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Set Monthly Budget'),
-                        content: TextField(
-                          controller: controller,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          decoration: const InputDecoration(
-                            labelText: 'Amount',
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(
-                              context,
-                              double.tryParse(controller.text.trim()),
-                            ),
-                            child: const Text('Save'),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (value != null && value > 0) {
-                      budget.setBudget(value);
-                    }
-                  },
-                  icon: const Icon(Icons.account_balance_wallet_outlined),
-                  label: const Text('Set Budget'),
-                ),
-              ),
-            ],
-          ),
+
         ],
       ),
     );
   }
 }
+
+
+
+
 
 class _SummaryCard extends StatelessWidget {
   final String label;
@@ -360,6 +307,10 @@ class _SummaryCard extends StatelessWidget {
     );
   }
 }
+
+
+
+
 
 class _CategoryChip extends StatelessWidget {
   final String label;
