@@ -14,7 +14,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
-  String _type = 'Expense';
+  String _category = 'General';
 
   @override
   void dispose() {
@@ -39,15 +39,17 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
     final provider = context.read<TransactionProvider>();
-    provider.addTransaction(
-      TransactionItem(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: _titleController.text.trim(),
-        amount: double.parse(_amountController.text.trim()),
-        date: _selectedDate,
-        isIncome: _type == 'Income',
-      ),
+    final bool isIncome = _category == 'Salary';
+    final item = TransactionItem(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: _titleController.text.trim(),
+      amount: double.parse(_amountController.text.trim()),
+      date: _selectedDate,
+      isIncome: isIncome,
+      category: _category,
     );
+    provider.addTransaction(item);
+    provider.addToCloud(item);
     Navigator.pop(context);
     ScaffoldMessenger.of(
       context,
@@ -66,24 +68,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                  hintText: 'e.g., Grocery shopping',
-                ),
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Title is required' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
-                decoration: const InputDecoration(
-                  labelText: 'Amount',
-                  prefixText: '	',
-                ),
+                decoration: const InputDecoration(labelText: 'Amount'),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty)
                     return 'Amount is required';
@@ -94,36 +83,61 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 },
               ),
               const SizedBox(height: 12),
+
+              DropdownButtonFormField<String>(
+                value: _category,
+                decoration: const InputDecoration(labelText: 'Category'),
+                items: const [
+                  DropdownMenuItem(value: 'General', child: Text('General')),
+                  DropdownMenuItem(value: 'Food', child: Text('Food')),
+                  DropdownMenuItem(
+                    value: 'Transport',
+                    child: Text('Transport'),
+                  ),
+                  DropdownMenuItem(value: 'Bills', child: Text('Bills')),
+                  DropdownMenuItem(value: 'Shopping', child: Text('Shopping')),
+                  DropdownMenuItem(value: 'Health', child: Text('Health')),
+                  DropdownMenuItem(value: 'Salary', child: Text('Salary')),
+                  DropdownMenuItem(value: 'Other', child: Text('Other')),
+                ],
+                onChanged: (v) => setState(() => _category = v ?? 'General'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _pickDate,
+                icon: const Icon(Icons.date_range),
+                label: Text(
+                  '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _titleController,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                  labelText: 'Note / Description',
+                  hintText: 'Optional notes about the transaction',
+                ),
+              ),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: _pickDate,
-                      icon: const Icon(Icons.date_range),
-                      label: Text(
-                        '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}',
-                      ),
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                      label: const Text('Cancel'),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  DropdownButton<String>(
-                    value: _type,
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Expense',
-                        child: Text('Expense'),
-                      ),
-                      DropdownMenuItem(value: 'Income', child: Text('Income')),
-                    ],
-                    onChanged: (v) => setState(() => _type = v ?? 'Expense'),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _submit,
+                      icon: const Icon(Icons.check),
+                      label: const Text('Save'),
+                    ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: _submit,
-                icon: const Icon(Icons.check),
-                label: const Text('Save'),
               ),
             ],
           ),
