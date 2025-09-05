@@ -15,6 +15,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final TextEditingController _amountController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   String _category = 'General';
+  bool _isIncome = false;
 
   @override
   void dispose() {
@@ -39,7 +40,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
     final provider = context.read<TransactionProvider>();
-    final bool isIncome = _category == 'Salary';
+    final bool isIncome = _isIncome;
     final item = TransactionItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: _titleController.text.trim(),
@@ -58,6 +59,18 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final expenseCategories = <String>[
+      'General',
+      'Food',
+      'Transport',
+      'Bills',
+      'Shopping',
+      'Health',
+      'Other',
+    ];
+    final incomeCategories = <String>['Salary', 'Other'];
+    final categories = _isIncome ? incomeCategories : expenseCategories;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Add Transaction')),
       body: SingleChildScrollView(
@@ -83,24 +96,36 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 },
               ),
               const SizedBox(height: 12),
-
-              DropdownButtonFormField<String>(
-                value: _category,
-                decoration: const InputDecoration(labelText: 'Category'),
-                items: const [
-                  DropdownMenuItem(value: 'General', child: Text('General')),
-                  DropdownMenuItem(value: 'Food', child: Text('Food')),
-                  DropdownMenuItem(
-                    value: 'Transport',
-                    child: Text('Transport'),
+              Row(
+                children: [
+                  ChoiceChip(
+                    selected: !_isIncome,
+                    label: const Text('Expense'),
+                    onSelected: (selected) {
+                      if (selected) setState(() => _isIncome = false);
+                    },
                   ),
-                  DropdownMenuItem(value: 'Bills', child: Text('Bills')),
-                  DropdownMenuItem(value: 'Shopping', child: Text('Shopping')),
-                  DropdownMenuItem(value: 'Health', child: Text('Health')),
-                  DropdownMenuItem(value: 'Salary', child: Text('Salary')),
-                  DropdownMenuItem(value: 'Other', child: Text('Other')),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    selected: _isIncome,
+                    label: const Text('Income'),
+                    onSelected: (selected) {
+                      if (selected) setState(() => _isIncome = true);
+                    },
+                  ),
                 ],
-                onChanged: (v) => setState(() => _category = v ?? 'General'),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: categories.contains(_category)
+                    ? _category
+                    : categories.first,
+                decoration: const InputDecoration(labelText: 'Category'),
+                items: categories
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (v) =>
+                    setState(() => _category = v ?? categories.first),
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
