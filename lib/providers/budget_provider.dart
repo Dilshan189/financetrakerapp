@@ -12,14 +12,14 @@ class BudgetProvider extends ChangeNotifier {
   String _keyFor(DateTime date) =>
       '${date.year}-${date.month.toString().padLeft(2, '0')}';
 
-  // Getters
+  ///Getters
   double get monthlyBudget => budgetFor(DateTime.now());
   double get spent => _spent;
   double get progress =>
       (monthlyBudget <= 0) ? 0 : (_spent / monthlyBudget).clamp(0, 1);
   Map<String, double> get monthlyBudgets => Map.unmodifiable(_budgetsByMonth);
 
-  // Business Logic (State Management)
+  /// State Management method
   double budgetFor(DateTime date) {
     return _budgetsByMonth[_keyFor(date)] ?? _monthlyBudget;
   }
