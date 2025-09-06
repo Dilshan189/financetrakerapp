@@ -35,6 +35,9 @@ class TransactionProvider extends ChangeNotifier {
     }
   }
 
+
+  /// stateManagement Method
+
   void addTransaction(TransactionItem item) {
     _items.insert(0, item);
     notifyListeners();
@@ -69,7 +72,11 @@ class TransactionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Firestore integration
+
+
+
+  /// FireStore integration  method  code
+
   Future<void> startListening() async {
     await stopListening();
     final user = FirebaseAuth.instance.currentUser;
@@ -101,9 +108,10 @@ class TransactionProvider extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
-    // Re-attach listener to force pull fresh data
     await startListening();
   }
+
+
 
   Future<void> addToCloud(TransactionItem item) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -122,6 +130,8 @@ class TransactionProvider extends ChangeNotifier {
     });
   }
 
+
+
   Future<void> updateInCloud(TransactionItem item) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -138,6 +148,7 @@ class TransactionProvider extends ChangeNotifier {
       'isIncome': item.isIncome,
     });
   }
+
 
   Future<void> deleteFromCloud(String id) async {
     final user = FirebaseAuth.instance.currentUser;

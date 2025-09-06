@@ -31,7 +31,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final _ = Theme.of(context);
 
     return Consumer<BudgetProvider>(
       builder: (context, budget, _) {
@@ -286,12 +286,12 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [progressColor, progressColor.withOpacity(0.8)],
+              colors: [progressColor, progressColor.withValues(alpha: 0.8)],
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: progressColor.withOpacity(0.3),
+                color: progressColor.withValues(alpha: 0.3),
                 blurRadius: _isEditing ? 25 : 20,
                 offset: const Offset(0, 8),
               ),
@@ -348,12 +348,12 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
                       vertical: 12,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: _errorMessage != null
                             ? Colors.red.shade300
-                            : Colors.white.withOpacity(0.3),
+                            : Colors.white.withValues(alpha: 0.3),
                         width: 2,
                       ),
                     ),
@@ -369,18 +369,18 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
                       decoration: InputDecoration(
                         prefixText: '\$ ',
                         prefixStyle: theme.textTheme.headlineMedium?.copyWith(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                         ),
                         border: InputBorder.none,
                         hintText: 'Enter amount...',
                         hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                         ),
                         suffixIcon: _controller.text.isNotEmpty
                             ? IconButton(
                                 icon: Icon(
                                   Icons.clear_rounded,
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withValues(alpha: 0.8),
                                 ),
                                 onPressed: () {
                                   _controller.clear();
@@ -408,7 +408,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade100.withOpacity(0.9),
+                      color: Colors.red.shade100.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -461,7 +461,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
                 Text(
                   'Tap to edit',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -472,7 +472,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
               Container(
                 height: 8,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: FractionallySizedBox(
@@ -498,7 +498,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
                         Text(
                           'Spent',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -519,7 +519,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
                         Text(
                           isOverBudget ? 'Over Budget' : 'Remaining',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -660,7 +660,7 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -670,7 +670,7 @@ class _StatCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -741,7 +741,7 @@ class _CategoryBreakdownSection extends StatelessWidget {
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.2),
+              color: theme.colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: categorySpending.isEmpty
@@ -844,7 +844,7 @@ class _CategoryBreakdownItem extends StatelessWidget {
                 child: Container(
                   height: 6,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: FractionallySizedBox(
@@ -912,16 +912,16 @@ class _BudgetTipsSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: tipColor.withOpacity(0.1),
+        color: tipColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: tipColor.withOpacity(0.3)),
+        border: Border.all(color: tipColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: tipColor.withOpacity(0.2),
+              color: tipColor.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(tipIcon, color: tipColor, size: 24),
@@ -969,9 +969,9 @@ class _PresetButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1),
         ),
         child: Text(
           '\$${amount.toStringAsFixed(0)}',
