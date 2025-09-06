@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Start cloud sync after login
+    /// Start cloud sync after login
     final transactionProvider = Provider.of<TransactionProvider>(
       context,
       listen: false,
@@ -46,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           _titleForIndex(_currentIndex),
           style: Theme.of(context).textTheme.headlineMedium,
