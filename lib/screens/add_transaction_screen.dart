@@ -73,13 +73,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     ];
 
     final categories = _isIncome ? incomeCategories : expenseCategories;
-    final currentCategory = categories.firstWhere(
+    final _ = categories.firstWhere(
       (cat) => cat.name == _category,
       orElse: () => categories.first,
     );
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text('Add Transaction', style: theme.textTheme.headlineMedium),
         backgroundColor: Colors.transparent,
@@ -96,7 +96,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Transaction Type Selector
+              /// Transaction Type Selector
               _TransactionTypeSelector(
                 isIncome: _isIncome,
                 onChanged: (isIncome) {
@@ -109,7 +109,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
               const SizedBox(height: 24),
 
-              // Amount Input
+              /// Amount Input
               _AmountInputCard(
                 controller: _amountController,
                 isIncome: _isIncome,
@@ -117,7 +117,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
               const SizedBox(height: 24),
 
-              // Category Selection
+              /// Category Selection
               _CategorySectionCard(
                 categories: categories,
                 selectedCategory: _category,
@@ -130,7 +130,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
               const SizedBox(height: 24),
 
-              // Date Selection
+              /// Date Selection
               _DateSectionCard(
                 selectedDate: _selectedDate,
                 onDateSelected: (date) {
@@ -142,12 +142,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
               const SizedBox(height: 24),
 
-              // Description Input
+              /// Description Input
               _DescriptionCard(controller: _titleController),
 
               const SizedBox(height: 32),
 
-              // Action Buttons
+              /// Action Buttons
               _ActionButtons(
                 onCancel: () => Navigator.pop(context),
                 onSave: _submit,
@@ -161,6 +161,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 }
+
+
+/// category Item class
 
 class CategoryItem {
   final String name;
@@ -185,7 +188,7 @@ class _TransactionTypeSelector extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -214,6 +217,9 @@ class _TransactionTypeSelector extends StatelessWidget {
     );
   }
 }
+
+
+/// class TypeOption
 
 class _TypeOption extends StatelessWidget {
   final IconData icon;
@@ -245,7 +251,7 @@ class _TypeOption extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -277,6 +283,8 @@ class _TypeOption extends StatelessWidget {
   }
 }
 
+/// Input card class
+
 class _AmountInputCard extends StatelessWidget {
   final TextEditingController controller;
   final bool isIncome;
@@ -292,7 +300,7 @@ class _AmountInputCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +312,9 @@ class _AmountInputCard extends StatelessWidget {
                 color: theme.colorScheme.primary,
                 size: 24,
               ),
+
               const SizedBox(width: 8),
+
               Text(
                 'Amount',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -313,7 +323,9 @@ class _AmountInputCard extends StatelessWidget {
               ),
             ],
           ),
+
           const SizedBox(height: 16),
+
           TextFormField(
             controller: controller,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -345,6 +357,8 @@ class _AmountInputCard extends StatelessWidget {
   }
 }
 
+/// category Selection class
+
 class _CategorySectionCard extends StatelessWidget {
   final List<CategoryItem> categories;
   final String selectedCategory;
@@ -365,7 +379,7 @@ class _CategorySectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,6 +419,8 @@ class _CategorySectionCard extends StatelessWidget {
   }
 }
 
+
+
 class _CategoryChip extends StatelessWidget {
   final CategoryItem category;
   final bool isSelected;
@@ -428,12 +444,12 @@ class _CategoryChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primaryContainer
-              : theme.colorScheme.surfaceVariant.withOpacity(0.3),
+              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.2),
+                : theme.colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
         child: Row(
@@ -463,6 +479,9 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
+
+/// selection date class
+
 class _DateSectionCard extends StatelessWidget {
   final DateTime selectedDate;
   final ValueChanged<DateTime> onDateSelected;
@@ -481,7 +500,7 @@ class _DateSectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -519,10 +538,10 @@ class _DateSectionCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.2),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -572,6 +591,9 @@ class _DateSectionCard extends StatelessWidget {
   }
 }
 
+
+/// description card
+
 class _DescriptionCard extends StatelessWidget {
   final TextEditingController controller;
 
@@ -586,7 +608,7 @@ class _DescriptionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -625,6 +647,8 @@ class _DescriptionCard extends StatelessWidget {
     );
   }
 }
+
+/// action button
 
 class _ActionButtons extends StatelessWidget {
   final VoidCallback onCancel;
