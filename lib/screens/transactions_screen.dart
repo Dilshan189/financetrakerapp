@@ -16,7 +16,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   bool _tableView = false;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
-  bool _showFilters = false;
 
   @override
   void dispose() {
@@ -93,10 +92,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   // Search Bar
                   Container(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: theme.colorScheme.outline.withOpacity(0.2),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.2),
                       ),
                     ),
                     child: TextField(
@@ -162,14 +161,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         decoration: BoxDecoration(
                           color: _tableView
                               ? theme.colorScheme.primaryContainer
-                              : theme.colorScheme.surfaceVariant.withOpacity(
-                                  0.3,
-                                ),
+                              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: _tableView
                                 ? theme.colorScheme.primary
-                                : theme.colorScheme.outline.withOpacity(0.2),
+                                : theme.colorScheme.outline.withValues(alpha: 0.2),
                           ),
                         ),
                         child: IconButton(
@@ -199,7 +196,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   horizontal: 20,
                   vertical: 12,
                 ),
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                 child: Text(
                   '${filtered.length} transaction${filtered.length != 1 ? 's' : ''} found',
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -245,7 +242,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               decoration: BoxDecoration(
                 color: Theme.of(
                   context,
-                ).colorScheme.onSurfaceVariant.withOpacity(0.4),
+                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -281,14 +278,14 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 ? Theme.of(context).colorScheme.primaryContainer
                                 : Theme.of(
                                     context,
-                                  ).colorScheme.surfaceVariant.withOpacity(0.3),
+                                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isSelected
                                   ? Theme.of(context).colorScheme.primary
                                   : Theme.of(
                                       context,
-                                    ).colorScheme.outline.withOpacity(0.2),
+                                    ).colorScheme.outline.withValues(alpha: 0.2),
                             ),
                           ),
                           child: Text(
@@ -338,9 +335,9 @@ class _FilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+          border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
         ),
         child: Row(
           children: [
@@ -382,7 +379,7 @@ class _EmptyTransactionsView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.5),
+                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -508,10 +505,10 @@ class _ModernTransactionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -557,7 +554,7 @@ class _ModernTransactionCard extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceVariant,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -651,13 +648,13 @@ class _TransactionsTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          headingRowColor: MaterialStateProperty.all(
-            theme.colorScheme.surfaceVariant.withOpacity(0.3),
+          headingRowColor: WidgetStateProperty.all(
+            theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           ),
           headingTextStyle: theme.textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w600,
@@ -688,7 +685,7 @@ class _TransactionsTable extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceVariant,
+                      color: theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(t.category),

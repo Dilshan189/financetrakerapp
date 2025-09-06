@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: Text(
           _titleForIndex(_currentIndex),
@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.logout_rounded),
               onPressed: () => _showLogoutDialog(context, authProvider),
               style: IconButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
                 padding: const EdgeInsets.all(12),
               ),
@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -288,13 +288,13 @@ class _WelcomeHeader extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [
             theme.colorScheme.primary,
-            theme.colorScheme.primary.withOpacity(0.8),
+            theme.colorScheme.primary.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.3),
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -312,7 +312,7 @@ class _WelcomeHeader extends StatelessWidget {
                     Text(
                       '$timeOfDay 👋',
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onPrimary.withOpacity(0.9),
+                        color: theme.colorScheme.onPrimary.withValues(alpha: 0.9),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -331,7 +331,7 @@ class _WelcomeHeader extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onPrimary.withOpacity(0.2),
+                  color: theme.colorScheme.onPrimary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
@@ -346,7 +346,7 @@ class _WelcomeHeader extends StatelessWidget {
           Text(
             'Total Balance',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onPrimary.withOpacity(0.8),
+              color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 8),
@@ -471,10 +471,10 @@ class _ModernStatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -554,7 +554,7 @@ class _RecentTransactionsSection extends StatelessWidget {
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.2),
+              color: theme.colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: transactions.isEmpty
@@ -609,7 +609,7 @@ class _TransactionListTile extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: theme.colorScheme.outline.withOpacity(0.1)),
+          bottom: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.1)),
         ),
       ),
       child: Row(
@@ -720,7 +720,7 @@ class _CategorySpendingSection extends StatelessWidget {
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.2),
+              color: theme.colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: categoryTotals.isEmpty
@@ -796,9 +796,9 @@ class _ModernCategoryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -826,7 +826,7 @@ class _ModernCategoryChip extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(

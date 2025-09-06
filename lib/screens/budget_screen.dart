@@ -38,7 +38,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
         final transactions = context.watch<TransactionProvider>().items;
         final now = DateTime.now();
 
-        // Calculate monthly spending
+        /// Calculate monthly spending
         final monthSpent = transactions
             .where(
               (t) =>
@@ -48,7 +48,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
             )
             .fold<double>(0, (sum, t) => sum + t.amount);
 
-        // Calculate category spending
+        /// Calculate category spending
         final Map<String, double> categorySpending = {};
         for (final t in transactions.where(
           (t) =>
@@ -77,7 +77,8 @@ class _BudgetScreenState extends State<BudgetScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Budget Overview Card
+
+              /// Budget Overview Card
               _BudgetOverviewCard(
                 monthlyBudget: monthlyBudget,
                 monthSpent: monthSpent,
@@ -90,7 +91,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
 
               const SizedBox(height: 24),
 
-              // Quick Stats
+              /// Quick Stats
               _BudgetStatsSection(
                 monthlyBudget: monthlyBudget,
                 monthSpent: monthSpent,
@@ -100,7 +101,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
 
               const SizedBox(height: 24),
 
-              // Category Breakdown
+              /// Category Breakdown
               _CategoryBreakdownSection(
                 categorySpending: categorySpending,
                 totalSpent: monthSpent,
@@ -109,7 +110,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
 
               const SizedBox(height: 24),
 
-              // Budget Tips
+              /// Budget Tips
               _BudgetTipsSection(progress: progress),
 
               const SizedBox(height: 100), // Space for navigation
@@ -121,6 +122,8 @@ class _BudgetScreenState extends State<BudgetScreen> {
   }
 }
 
+
+/// overViewCard class
 class _BudgetOverviewCard extends StatefulWidget {
   final double monthlyBudget;
   final double monthSpent;
@@ -140,6 +143,8 @@ class _BudgetOverviewCard extends StatefulWidget {
   State<_BudgetOverviewCard> createState() => _BudgetOverviewCardState();
 }
 
+
+
 class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
     with SingleTickerProviderStateMixin {
   late TextEditingController _controller;
@@ -149,7 +154,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
   String? _errorMessage;
   final _formKey = GlobalKey<FormState>();
 
-  // Quick preset amounts for easy selection
+  ///  preset amounts
   final List<double> _presetAmounts = [
     500,
     1000,
@@ -191,7 +196,6 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
 
     if (_isEditing) {
       _animationController.forward();
-      // Auto-focus and select all text for quick editing
       Future.delayed(const Duration(milliseconds: 100), () {
         _controller.selection = TextSelection(
           baseOffset: 0,
@@ -237,7 +241,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
       return;
     }
 
-    // Success - save the budget
+    /// Success save the budget
     widget.onBudgetUpdate(parsed);
     setState(() {
       _isEditing = false;
@@ -246,7 +250,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
 
     _animationController.reverse();
 
-    // Show success feedback
+    /// Show success feedback
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Budget updated to \$${parsed.toStringAsFixed(2)}'),
@@ -545,6 +549,8 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
   }
 }
 
+/// indiscretion class
+
 class _BudgetStatsSection extends StatelessWidget {
   final double monthlyBudget;
   final double monthSpent;
@@ -636,6 +642,8 @@ class _BudgetStatsSection extends StatelessWidget {
   }
 }
 
+
+/// class card
 class _StatCard extends StatelessWidget {
   final String title;
   final String value;
@@ -707,6 +715,8 @@ class _StatCard extends StatelessWidget {
   }
 }
 
+
+/// category breakdown
 class _CategoryBreakdownSection extends StatelessWidget {
   final Map<String, double> categorySpending;
   final double totalSpent;
@@ -789,6 +799,8 @@ class _CategoryBreakdownSection extends StatelessWidget {
   }
 }
 
+
+/// item class
 class _CategoryBreakdownItem extends StatelessWidget {
   final String category;
   final double amount;
@@ -874,6 +886,9 @@ class _CategoryBreakdownItem extends StatelessWidget {
   }
 }
 
+
+/// tipSection class
+
 class _BudgetTipsSection extends StatelessWidget {
   final double progress;
 
@@ -953,6 +968,8 @@ class _BudgetTipsSection extends StatelessWidget {
     );
   }
 }
+
+/// press button class
 
 class _PresetButton extends StatelessWidget {
   final double amount;
