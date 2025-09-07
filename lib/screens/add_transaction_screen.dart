@@ -51,6 +51,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   @override
+
+  /// category Icon
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final expenseCategories = <CategoryItem>[
@@ -419,7 +421,7 @@ class _CategorySectionCard extends StatelessWidget {
   }
 }
 
-
+/// category chip class
 
 class _CategoryChip extends StatelessWidget {
   final CategoryItem category;

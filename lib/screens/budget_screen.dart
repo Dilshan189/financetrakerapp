@@ -439,7 +439,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
 
                 const SizedBox(height: 16),
 
-                // Quick preset buttons
+                /// Quick preset buttons
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -472,7 +472,7 @@ class _BudgetOverviewCardState extends State<_BudgetOverviewCard>
 
               const SizedBox(height: 20),
 
-              // Progress Bar
+              /// Progress Bar
               Container(
                 height: 8,
                 decoration: BoxDecoration(
