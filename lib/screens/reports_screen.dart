@@ -252,7 +252,7 @@ class _LegendTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(8),
@@ -263,7 +263,7 @@ class _LegendTile extends StatelessWidget {
           _LegendDot(color: color),
           const SizedBox(width: 2),
           Text(label,
-            style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
+            style: theme.textTheme.bodySmall?.copyWith(fontSize: 12,fontWeight: FontWeight.bold),
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(width: 8),
