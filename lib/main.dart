@@ -1,10 +1,11 @@
 import 'package:financetrakerapp/providers/auth_provider.dart';
 import 'package:financetrakerapp/providers/transaction_provider.dart';
 import 'package:financetrakerapp/providers/budget_provider.dart';
-import 'package:financetrakerapp/screens/auth/authmange_screen.dart';
+import 'package:financetrakerapp/screens/splashscreen.dart';
 import 'package:financetrakerapp/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
@@ -26,11 +27,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => BudgetProvider()),
       ],
-      child: MaterialApp(
+      child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Finance Tracker',
         theme: AppTheme.lightTheme,
-        home: const AuthManageScreen(),
+        home: const SplashScreen(),
       ),
     );
   }
