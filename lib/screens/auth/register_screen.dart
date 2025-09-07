@@ -16,6 +16,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool _obscurePassword = true;
+  bool _obscurePasswords = true;
 
 
   /// register method
@@ -143,12 +145,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       /// Password
                       TextFormField(
                         controller: _passwordController,
-                        decoration: const InputDecoration(
+                        obscureText: _obscurePassword,
+                        decoration: InputDecoration(
                           labelText: "Password",
-                          prefixIcon: Icon(Icons.lock),
-                          border: OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                          border: const OutlineInputBorder(),
                         ),
-                        obscureText: true,
                         validator: (v) => (v == null || v.length < 6)
                             ? 'Min 6 characters'
                             : null,
@@ -158,12 +170,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       /// Confirm Password
                       TextFormField(
                         controller: _confirmPasswordController,
-                        decoration: const InputDecoration(
+                        obscureText: _obscurePasswords,
+                        decoration: InputDecoration(
                           labelText: "Confirm Password",
-                          prefixIcon: Icon(Icons.lock_outline),
-                          border: OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePasswords
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePasswords = !_obscurePasswords;
+                              });
+                            },
+                          ),
+                          border: const OutlineInputBorder(),
                         ),
-                        obscureText: true,
                         validator: (v) => v != _passwordController.text
                             ? 'Passwords do not match'
                             : null,
