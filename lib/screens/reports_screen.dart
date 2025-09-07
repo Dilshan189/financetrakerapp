@@ -250,8 +250,9 @@ class _LegendTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(8),
@@ -260,8 +261,11 @@ class _LegendTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _LegendDot(color: color),
-          const SizedBox(width: 8),
-          Text(label),
+          const SizedBox(width: 2),
+          Text(label,
+            style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
+            overflow: TextOverflow.ellipsis,
+          ),
           const SizedBox(width: 8),
           Text('${percent.toStringAsFixed(0)}%'),
         ],
