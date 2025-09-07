@@ -23,6 +23,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     super.dispose();
   }
 
+  /// date range calculation
+
   Future<void> _pickRange() async {
     final now = DateTime.now();
     final firstDate = DateTime(now.year - 5);
@@ -42,16 +44,16 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   Iterable<TransactionItem> _applyFilters(List<TransactionItem> items) {
     return items.where((t) {
-      // Category filter
+      /// Category filter
       final inCategory = _category == 'All' || t.category == _category;
 
-      // Date range filter
+      /// Date range filter
       final inRange = _range == null
           ? true
           : (t.date.isAfter(_range!.start.subtract(const Duration(days: 1))) &&
                 t.date.isBefore(_range!.end.add(const Duration(days: 1))));
 
-      // Search filter
+      /// Search filter
       final matchesSearch =
           _searchQuery.isEmpty ||
           t.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -83,13 +85,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
         return Column(
           children: [
-            // Search and Filter Header
+            /// Search and Filter Header
             Container(
               color: theme.colorScheme.surface,
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // Search Bar
+                  /// Search Bar
                   Container(
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
@@ -136,7 +138,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Filter Controls
+                  /// Filter Controls
                   Row(
                     children: [
                       Expanded(
@@ -156,7 +158,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           onTap: () => _showCategoryPicker(categories),
                         ),
                       ),
+
                       const SizedBox(width: 12),
+
                       Container(
                         decoration: BoxDecoration(
                           color: _tableView
@@ -188,7 +192,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
             ),
 
-            // Results Summary
+            /// Results Summary
             if (filtered.isNotEmpty)
               Container(
                 width: double.infinity,
@@ -205,7 +209,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 ),
               ),
 
-            // Transactions List
+            /// Transactions List
             Expanded(
               child: filtered.isEmpty
                   ? _NoResultsView(searchQuery: _searchQuery)
@@ -223,75 +227,78 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return '${date.day}/${date.month}/${date.year.toString().substring(2)}';
   }
 
+
+
+  /// category  picker bottom sheet
   void _showCategoryPicker(List<String> categories) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
+      builder: (context) {
+
+        return DraggableScrollableSheet(
+          initialChildSize: 0.3,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          builder: (context, scrollController) {
+            return Container(
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Select Category',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: categories.map((category) {
-                      final isSelected = category == _category;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _category = category;
-                          });
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primaryContainer
-                                : Theme.of(
-                                    context,
-                                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(
-                                      context,
-                                    ).colorScheme.outline.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          child: Text(
-                            category,
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
+              child: SingleChildScrollView(
+                controller: scrollController,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Select Category',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: categories.map((category) {
+                          final isSelected = category == _category;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _category = category;
+                              });
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primaryContainer
+                                    : Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest
+                                    .withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                      .colorScheme
+                                      .outline
+                                      .withValues(alpha: 0.2),
+                                ),
+                              ),
+                              child: Text(
+                                category,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(
                                   color: isSelected
                                       ? Theme.of(context).colorScheme.primary
                                       : Theme.of(context).colorScheme.onSurface,
@@ -299,21 +306,27 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                       ? FontWeight.w600
                                       : FontWeight.w400,
                                 ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
+
 }
+
+
+/// FilterChip class
 
 class _FilterChip extends StatelessWidget {
   final IconData icon;
@@ -364,6 +377,8 @@ class _FilterChip extends StatelessWidget {
     );
   }
 }
+
+/// Empty transaction view Class
 
 class _EmptyTransactionsView extends StatelessWidget {
   @override
@@ -419,6 +434,8 @@ class _EmptyTransactionsView extends StatelessWidget {
   }
 }
 
+/// No resultView Class
+
 class _NoResultsView extends StatelessWidget {
   final String searchQuery;
 
@@ -471,6 +488,9 @@ class _NoResultsView extends StatelessWidget {
   }
 }
 
+
+/// transaction list
+
 class _TransactionsList extends StatelessWidget {
   final List<TransactionItem> transactions;
 
@@ -489,6 +509,8 @@ class _TransactionsList extends StatelessWidget {
     );
   }
 }
+
+/// decentralisation card
 
 class _ModernTransactionCard extends StatelessWidget {
   final TransactionItem transaction;
@@ -595,6 +617,8 @@ class _ModernTransactionCard extends StatelessWidget {
     );
   }
 
+  /// category
+
   IconData _getCategoryIcon(String category, bool isIncome) {
     if (isIncome) {
       switch (category.toLowerCase()) {
@@ -634,6 +658,8 @@ class _ModernTransactionCard extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 }
+
+/// transaction table class
 
 class _TransactionsTable extends StatelessWidget {
   final List<TransactionItem> rows;
