@@ -419,14 +419,7 @@ class _EmptyTransactionsView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () {
-                // This would trigger the add transaction flow
-                // Ideally this should be a callback to the parent
-              },
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Add Transaction'),
-            ),
+
           ],
         ),
       ),
