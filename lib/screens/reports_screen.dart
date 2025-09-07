@@ -30,7 +30,7 @@ class ReportsScreen extends StatelessWidget {
       (s, v) => s + v,
     );
 
-    /// Monthly income vs expenses for last 6 months (including current)
+    /// Monthly income and expenses for last 6 months
     final List<_MonthPoint> months = [];
     for (int i = 5; i >= 0; i--) {
       final date = DateTime(now.year, now.month - i, 1);
@@ -166,7 +166,7 @@ class ReportsScreen extends StatelessWidget {
                               child: LayoutBuilder(
                                 builder: (context, c) {
                                   final double maxHeight =
-                                      c.maxHeight - 36; // reserve for labels
+                                      c.maxHeight - 36; /// reserve for labels
                                   final double incomeH = maxBar == 0
                                       ? 0
                                       : (m.income / maxBar) * maxHeight;
@@ -236,6 +236,8 @@ class ReportsScreen extends StatelessWidget {
   }
 }
 
+/// legend title add
+
 class _LegendTile extends StatelessWidget {
   final Color color;
   final String label;
@@ -268,6 +270,8 @@ class _LegendTile extends StatelessWidget {
   }
 }
 
+
+/// dot add
 class _LegendDot extends StatelessWidget {
   final Color color;
   const _LegendDot({required this.color});

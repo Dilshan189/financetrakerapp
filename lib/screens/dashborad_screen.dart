@@ -88,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+        /// add bottom navigation bar
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           backgroundColor: Theme.of(context).colorScheme.surface,
@@ -142,6 +143,8 @@ class _HomeScreenState extends State<HomeScreen> {
           : null,
     );
   }
+
+  /// logout dialog method
 
   void _showLogoutDialog(BuildContext context, AuthProvider authProvider) {
     showDialog(
@@ -198,6 +201,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+///
+
 class _DashboardWelcome extends StatelessWidget {
   final String userEmail;
   const _DashboardWelcome({required this.userEmail});
@@ -207,6 +212,8 @@ class _DashboardWelcome extends StatelessWidget {
     return _HomeDashboard(userEmail: userEmail);
   }
 }
+
+///
 
 class _HomeDashboard extends StatelessWidget {
   final String userEmail;
@@ -238,7 +245,7 @@ class _HomeDashboard extends StatelessWidget {
       );
     }
 
-    // Recent transactions (last 5)
+    /// Recent transactions
     final recentTransactions = [...transactions]
       ..sort((a, b) => b.date.compareTo(a.date))
       ..take(5);
@@ -248,12 +255,12 @@ class _HomeDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Welcome Header
+          /// Welcome Header
           _WelcomeHeader(userEmail: userEmail, balance: balance),
 
           const SizedBox(height: 24),
 
-          // Quick Stats Cards
+          /// Quick Stats Cards
           _QuickStatsSection(
             totalIncome: totalIncome,
             totalExpenses: totalExpenses,
@@ -262,12 +269,12 @@ class _HomeDashboard extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Recent Transactions
+          /// Recent Transactions
           _RecentTransactionsSection(transactions: recentTransactions),
 
           const SizedBox(height: 24),
 
-          // Category Spending Overview
+          /// Category Spending Overview
           _CategorySpendingSection(
             categoryTotals: categoryTotals,
             totalExpenses: totalExpenses,
@@ -280,6 +287,7 @@ class _HomeDashboard extends StatelessWidget {
   }
 }
 
+/// welcome header class
 class _WelcomeHeader extends StatelessWidget {
   final String userEmail;
   final double balance;
@@ -340,6 +348,7 @@ class _WelcomeHeader extends StatelessWidget {
                   ],
                 ),
               ),
+
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -354,7 +363,9 @@ class _WelcomeHeader extends StatelessWidget {
               ),
             ],
           ),
+
           const SizedBox(height: 24),
+
           Text(
             'Total Balance',
             style: theme.textTheme.titleMedium?.copyWith(
@@ -398,6 +409,7 @@ class _WelcomeHeader extends StatelessWidget {
   }
 }
 
+/// quick statsSection
 class _QuickStatsSection extends StatelessWidget {
   final double totalIncome;
   final double totalExpenses;
@@ -455,6 +467,8 @@ class _QuickStatsSection extends StatelessWidget {
     );
   }
 }
+
+/// modernStatCard
 
 class _ModernStatCard extends StatelessWidget {
   final String title;
@@ -535,6 +549,9 @@ class _ModernStatCard extends StatelessWidget {
   }
 }
 
+
+/// recent transactions
+
 class _RecentTransactionsSection extends StatelessWidget {
   final Iterable<TransactionItem> transactions;
 
@@ -560,7 +577,9 @@ class _RecentTransactionsSection extends StatelessWidget {
             ),
           ],
         ),
+
         const SizedBox(height: 16),
+
         Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
@@ -606,6 +625,8 @@ class _RecentTransactionsSection extends StatelessWidget {
     );
   }
 }
+
+/// transaction list
 
 class _TransactionListTile extends StatelessWidget {
   final TransactionItem transaction;
@@ -663,6 +684,7 @@ class _TransactionListTile extends StatelessWidget {
               ],
             ),
           ),
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -675,7 +697,9 @@ class _TransactionListTile extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+
               const SizedBox(height: 2),
+
               Text(
                 _formatDate(transaction.date),
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -700,6 +724,8 @@ class _TransactionListTile extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 }
+
+/// category spending
 
 class _CategorySpendingSection extends StatelessWidget {
   final Map<String, double> categoryTotals;
@@ -787,6 +813,8 @@ class _CategorySpendingSection extends StatelessWidget {
     );
   }
 }
+
+/// modern category class
 
 class _ModernCategoryChip extends StatelessWidget {
   final String label;
