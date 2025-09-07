@@ -94,7 +94,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   /// Search Bar
                   Container(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: theme.colorScheme.outline.withValues(alpha: 0.2),
@@ -165,12 +166,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         decoration: BoxDecoration(
                           color: _tableView
                               ? theme.colorScheme.primaryContainer
-                              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+                              : theme.colorScheme.surfaceContainerHighest
+                                    .withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: _tableView
                                 ? theme.colorScheme.primary
-                                : theme.colorScheme.outline.withValues(alpha: 0.2),
+                                : theme.colorScheme.outline.withValues(
+                                    alpha: 0.2,
+                                  ),
                           ),
                         ),
                         child: IconButton(
@@ -200,7 +204,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   horizontal: 20,
                   vertical: 12,
                 ),
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
                 child: Text(
                   '${filtered.length} transaction${filtered.length != 1 ? 's' : ''} found',
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -227,8 +233,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return '${date.day}/${date.month}/${date.year.toString().substring(2)}';
   }
 
-
-
   /// category  picker bottom sheet
   void _showCategoryPicker(List<String> categories) {
     showModalBottomSheet(
@@ -236,7 +240,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-
         return DraggableScrollableSheet(
           initialChildSize: 0.3,
           minChildSize: 0.3,
@@ -245,7 +248,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             return Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
               ),
               child: SingleChildScrollView(
                 controller: scrollController,
@@ -278,34 +283,36 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? Theme.of(context).colorScheme.primaryContainer
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.primaryContainer
                                     : Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHighest
-                                    .withValues(alpha: 0.3),
+                                          .colorScheme
+                                          .surfaceContainerHighest
+                                          .withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isSelected
                                       ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                      .colorScheme
-                                      .outline
-                                      .withValues(alpha: 0.2),
+                                      : Theme.of(context).colorScheme.outline
+                                            .withValues(alpha: 0.2),
                                 ),
                               ),
                               child: Text(
                                 category,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
+                                style: Theme.of(context).textTheme.labelMedium
                                     ?.copyWith(
-                                  color: isSelected
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context).colorScheme.onSurface,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                ),
+                                      color: isSelected
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
+                                    ),
                               ),
                             ),
                           );
@@ -322,9 +329,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       },
     );
   }
-
 }
-
 
 /// FilterChip class
 
@@ -348,9 +353,13 @@ class _FilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.3,
+          ),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+          border: Border.all(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
         ),
         child: Row(
           children: [
@@ -394,7 +403,9 @@ class _EmptyTransactionsView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                color: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.5,
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -419,7 +430,6 @@ class _EmptyTransactionsView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-
           ],
         ),
       ),
@@ -481,7 +491,6 @@ class _NoResultsView extends StatelessWidget {
   }
 }
 
-
 /// transaction list
 
 class _TransactionsList extends StatelessWidget {
@@ -520,7 +529,9 @@ class _ModernTransactionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -662,68 +673,87 @@ class _TransactionsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      margin: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
-      ),
+    return Scrollbar(
+      thumbVisibility: true,
+      thickness: 6,
+      radius: const Radius.circular(8),
       child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          headingRowColor: WidgetStateProperty.all(
-            theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: theme.colorScheme.outline.withValues(alpha: 0.2),
+            ),
           ),
-          headingTextStyle: theme.textTheme.labelMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onSurface,
-          ),
-          dataTextStyle: theme.textTheme.bodyMedium,
-          columns: const [
-            DataColumn(label: Text('Amount')),
-            DataColumn(label: Text('Category')),
-            DataColumn(label: Text('Description')),
-            DataColumn(label: Text('Date')),
-          ],
-          rows: rows.map((t) {
-            final dateStr = '${t.date.day}/${t.date.month}/${t.date.year}';
-            final amountStr =
-                '${t.isIncome ? '+' : '-'}\$${t.amount.toStringAsFixed(2)}';
-            final amountStyle = TextStyle(
-              color: t.isIncome ? AppTheme.incomeColor : AppTheme.expenseColor,
-              fontWeight: FontWeight.w600,
-            );
-            return DataRow(
-              cells: [
-                DataCell(Text(amountStr, style: amountStyle)),
-                DataCell(
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(t.category),
+          child: Scrollbar(
+            thumbVisibility: true, // Always show
+            thickness: 6,
+            radius: const Radius.circular(8),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                headingRowColor: WidgetStateProperty.all(
+                  theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
                   ),
                 ),
-                DataCell(
-                  SizedBox(
-                    width: 200,
-                    child: Text(
-                      t.title.isEmpty ? '-' : t.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+                headingTextStyle: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
                 ),
-                DataCell(Text(dateStr)),
-              ],
-            );
-          }).toList(),
+                dataTextStyle: theme.textTheme.bodyMedium,
+                columns: const [
+                  DataColumn(label: Text('Amount')),
+                  DataColumn(label: Text('Category')),
+                  DataColumn(label: Text('Description')),
+                  DataColumn(label: Text('Date')),
+                ],
+                rows: rows.map((t) {
+                  final dateStr =
+                      '${t.date.day}/${t.date.month}/${t.date.year}';
+                  final amountStr =
+                      '${t.isIncome ? '+' : '-'}\$${t.amount.toStringAsFixed(2)}';
+                  final amountStyle = TextStyle(
+                    color: t.isIncome
+                        ? AppTheme.incomeColor
+                        : AppTheme.expenseColor,
+                    fontWeight: FontWeight.w600,
+                  );
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(amountStr, style: amountStyle)),
+                      DataCell(
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(t.category),
+                        ),
+                      ),
+                      DataCell(
+                        SizedBox(
+                          width: 200,
+                          child: Text(
+                            t.title.isEmpty ? '-' : t.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      DataCell(Text(dateStr)),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
         ),
       ),
     );
