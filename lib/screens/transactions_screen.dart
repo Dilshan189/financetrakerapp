@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:financetrakerapp/providers/transaction_provider.dart';
 import 'package:financetrakerapp/theme/app_theme.dart';
+import 'package:financetrakerapp/screens/add_transaction_screen.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -614,6 +615,65 @@ class _ModernTransactionCard extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  IconButton(
+                    tooltip: 'Edit',
+                    onPressed: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              AddTransactionScreen(existing: transaction),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.edit_rounded),
+                    color: theme.colorScheme.primary,
+                  ),
+                  IconButton(
+                    tooltip: 'Delete',
+                    onPressed: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Delete Transaction'),
+                          content: const Text(
+                            'Are you sure you want to delete this transaction?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: const Text('Cancel'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.error,
+                                foregroundColor: theme.colorScheme.onError,
+                              ),
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmed == true) {
+                        final provider = context.read<TransactionProvider>();
+                        provider.deleteTransaction(transaction.id);
+                        await provider.deleteFromCloud(transaction.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Transaction deleted'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.delete_rounded),
+                    color: theme.colorScheme.error,
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -673,86 +733,141 @@ class _TransactionsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scrollbar(
-      thumbVisibility: true,
-      thickness: 6,
-      radius: const Radius.circular(8),
-      child: SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: theme.colorScheme.outline.withValues(alpha: 0.2),
+    return Container(
+      margin: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Scrollbar(
+        thumbVisibility: true, // Always show
+        thickness: 6,
+        radius: const Radius.circular(8),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            headingRowColor: WidgetStateProperty.all(
+              theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             ),
-          ),
-          child: Scrollbar(
-            thumbVisibility: true, // Always show
-            thickness: 6,
-            radius: const Radius.circular(8),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                headingRowColor: WidgetStateProperty.all(
-                  theme.colorScheme.surfaceContainerHighest.withValues(
-                    alpha: 0.3,
+            headingTextStyle: theme.textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+            dataTextStyle: theme.textTheme.bodyMedium,
+            columns: const [
+              DataColumn(label: Text('Amount')),
+              DataColumn(label: Text('Category')),
+              DataColumn(label: Text('Description')),
+              DataColumn(label: Text('Date')),
+              DataColumn(label: Text('Actions')),
+            ],
+            rows: rows.map((t) {
+              final dateStr = '${t.date.day}/${t.date.month}/${t.date.year}';
+              final amountStr =
+                  '${t.isIncome ? '+' : '-'}\$${t.amount.toStringAsFixed(2)}';
+              final amountStyle = TextStyle(
+                color: t.isIncome
+                    ? AppTheme.incomeColor
+                    : AppTheme.expenseColor,
+                fontWeight: FontWeight.w600,
+              );
+              return DataRow(
+                cells: [
+                  DataCell(Text(amountStr, style: amountStyle)),
+                  DataCell(
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(t.category),
+                    ),
                   ),
-                ),
-                headingTextStyle: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
-                ),
-                dataTextStyle: theme.textTheme.bodyMedium,
-                columns: const [
-                  DataColumn(label: Text('Amount')),
-                  DataColumn(label: Text('Category')),
-                  DataColumn(label: Text('Description')),
-                  DataColumn(label: Text('Date')),
+                  DataCell(
+                    SizedBox(
+                      width: 200,
+                      child: Text(
+                        t.title.isEmpty ? '-' : t.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  DataCell(Text(dateStr)),
+                  DataCell(
+                    Row(
+                      children: [
+                        IconButton(
+                          tooltip: 'Edit',
+                          onPressed: () async {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    AddTransactionScreen(existing: t),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.edit_rounded),
+                          color: theme.colorScheme.primary,
+                        ),
+                        IconButton(
+                          tooltip: 'Delete',
+                          onPressed: () async {
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Delete Transaction'),
+                                content: const Text(
+                                  'Are you sure you want to delete this transaction?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(ctx).pop(false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        Navigator.of(ctx).pop(true),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: theme.colorScheme.error,
+                                      foregroundColor:
+                                          theme.colorScheme.onError,
+                                    ),
+                                    child: const Text('Delete'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirmed == true) {
+                              final provider = context
+                                  .read<TransactionProvider>();
+                              provider.deleteTransaction(t.id);
+                              await provider.deleteFromCloud(t.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text('Transaction deleted'),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.delete_rounded),
+                          color: theme.colorScheme.error,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-                rows: rows.map((t) {
-                  final dateStr =
-                      '${t.date.day}/${t.date.month}/${t.date.year}';
-                  final amountStr =
-                      '${t.isIncome ? '+' : '-'}\$${t.amount.toStringAsFixed(2)}';
-                  final amountStyle = TextStyle(
-                    color: t.isIncome
-                        ? AppTheme.incomeColor
-                        : AppTheme.expenseColor,
-                    fontWeight: FontWeight.w600,
-                  );
-                  return DataRow(
-                    cells: [
-                      DataCell(Text(amountStr, style: amountStyle)),
-                      DataCell(
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(t.category),
-                        ),
-                      ),
-                      DataCell(
-                        SizedBox(
-                          width: 200,
-                          child: Text(
-                            t.title.isEmpty ? '-' : t.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      DataCell(Text(dateStr)),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
+              );
+            }).toList(),
           ),
         ),
       ),

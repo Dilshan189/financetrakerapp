@@ -4,7 +4,8 @@ import 'package:financetrakerapp/providers/transaction_provider.dart';
 import 'package:financetrakerapp/theme/app_theme.dart';
 
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({super.key});
+  final TransactionItem? existing;
+  const AddTransactionScreen({super.key, this.existing});
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -19,39 +20,73 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   bool _isIncome = false;
 
   @override
+  void initState() {
+    super.initState();
+    final existing = widget.existing;
+    if (existing != null) {
+      _titleController.text = existing.title;
+      _amountController.text = existing.amount.toStringAsFixed(2);
+      _selectedDate = existing.date;
+      _category = existing.category;
+      _isIncome = existing.isIncome;
+    }
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
     final provider = context.read<TransactionProvider>();
     final bool isIncome = _isIncome;
-    final item = TransactionItem(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: _titleController.text.trim(),
-      amount: double.parse(_amountController.text.trim()),
-      date: _selectedDate,
-      isIncome: isIncome,
-      category: _category,
-    );
-    provider.addTransaction(item);
-    provider.addToCloud(item);
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Transaction added successfully'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+
+    if (widget.existing != null) {
+      final updated = TransactionItem(
+        id: widget.existing!.id,
+        title: _titleController.text.trim(),
+        amount: double.parse(_amountController.text.trim()),
+        date: _selectedDate,
+        isIncome: isIncome,
+        category: _category,
+      );
+      provider.updateTransaction(updated);
+      await provider.updateInCloud(updated);
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Transaction updated successfully'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      final item = TransactionItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: _titleController.text.trim(),
+        amount: double.parse(_amountController.text.trim()),
+        date: _selectedDate,
+        isIncome: isIncome,
+        category: _category,
+      );
+      provider.addTransaction(item);
+      provider.addToCloud(item);
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Transaction added successfully'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   @override
-
   /// category Icon
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -83,7 +118,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: Text('Add Transaction', style: theme.textTheme.headlineMedium),
+        title: Text(
+          widget.existing == null ? 'Add Transaction' : 'Edit Transaction',
+          style: theme.textTheme.headlineMedium,
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -164,7 +202,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 }
 
-
 /// category Item class
 
 class CategoryItem {
@@ -219,7 +256,6 @@ class _TransactionTypeSelector extends StatelessWidget {
     );
   }
 }
-
 
 /// class TypeOption
 
@@ -302,7 +338,9 @@ class _AmountInputCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,7 +419,9 @@ class _CategorySectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,7 +486,9 @@ class _CategoryChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primaryContainer
-              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              : theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
@@ -481,7 +523,6 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
-
 /// selection date class
 
 class _DateSectionCard extends StatelessWidget {
@@ -502,7 +543,9 @@ class _DateSectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -540,7 +583,9 @@ class _DateSectionCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: theme.colorScheme.outline.withValues(alpha: 0.2),
@@ -593,7 +638,6 @@ class _DateSectionCard extends StatelessWidget {
   }
 }
 
-
 /// description card
 
 class _DescriptionCard extends StatelessWidget {
@@ -610,7 +654,9 @@ class _DescriptionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
