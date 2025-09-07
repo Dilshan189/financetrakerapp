@@ -1,4 +1,5 @@
 import 'package:financetrakerapp/providers/auth_provider.dart';
+import 'package:financetrakerapp/screens/auth/login_screen.dart';
 import 'package:financetrakerapp/screens/transactions_screen.dart';
 import 'package:financetrakerapp/screens/budget_screen.dart';
 import 'package:financetrakerapp/screens/reports_screen.dart';
@@ -154,10 +155,19 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
+
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                authProvider.logout();
+                await authProvider.logout();
+
+                /// redirect to login screen
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.error,
@@ -165,6 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: const Text('Logout'),
             ),
+
           ],
         );
       },
