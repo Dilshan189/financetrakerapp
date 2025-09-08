@@ -54,7 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.toString()),
+          content: Text(e .toString()),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
         ),
