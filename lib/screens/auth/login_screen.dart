@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         "Sign in to continue managing your finances",
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 );
 
-                                // wait a bit, then go to dashboard
+                                /// wait a bit, then go to dashboard
                                 await Future.delayed(
                                     const Duration(seconds: 2));
 
@@ -200,9 +200,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                 );
                               }
                             } catch (e) {
+                              String errorMessage;
+
+                              if (e is String) {
+                                errorMessage = e;
+                              } else if (e is Exception) {
+                                errorMessage = e.toString().replaceFirst("Exception: ", "");
+                              } else {
+                                errorMessage = "Login failed. Please try again.";
+                              }
+
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(e.toString()),
+                                  content: Text(errorMessage),
                                   backgroundColor: Colors.red,
                                   behavior: SnackBarBehavior.floating,
                                 ),

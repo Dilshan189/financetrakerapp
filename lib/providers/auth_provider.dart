@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -33,17 +35,40 @@ class AuthProvider extends ChangeNotifier {
         message = "This account has been disabled.";
       }
 
+      throw Exception(message);
+    } on SocketException {
+      throw Exception("No Internet Connection. Please check your network.");
+    } catch (e) {
+      throw Exception("Something went wrong. Try again later.");
+    }
+  }
+
+
+
+  Future<void> register(String email, String password) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      String message = "Registration failed. Please try again.";
+
+      if (e.code == 'email-already-in-use') {
+        message = "This email is already registered.";
+      } else if (e.code == 'weak-password') {
+        message = "Password is too weak.";
+      } else if (e.code == 'invalid-email') {
+        message = "Email format is incorrect.";
+      }
+
       throw message;
     } catch (e) {
       throw ("Something went wrong. Try again later.");
     }
   }
 
-
-  Future<void> register(String email, String password) async {
-    await _auth.createUserWithEmailAndPassword(email: email, password: password);
-    notifyListeners();
-  }
 
   Future<void> logout() async {
     await _auth.signOut();
